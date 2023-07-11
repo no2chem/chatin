@@ -1,0 +1,8 @@
+node_modules
+dist
+esm
+/*.js
+/*.cjs
+/*.d.ts
+/esm/*.js
+/esm/*.d.ts

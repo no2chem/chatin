@@ -1,0 +1,36 @@
+name: Publish tagged versioned builds
+
+on:
+  push:
+    branches:
+      -  "main"
+
+jobs:
+  # define job to build and publish npm
+  build-and-publish-tagged:
+    name: Build and publish tagged image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+    # steps to perform in job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          registry-url: 'https://registry.npmjs.org'
+          scope: 'no2chem'
+      # Skip post-install scripts here, as a malicious
+      # script could steal NODE_AUTH_TOKEN.
+      - run: npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release
