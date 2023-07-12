@@ -1,6 +1,6 @@
 {
   "name": "chatin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "ChatGPT library with function call interface support",
   "main": "dist/index.js",
