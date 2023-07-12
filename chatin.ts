@@ -17,7 +17,11 @@ export function ChatFunction(data: {name: string; description: string}) {
   return function (
     target: any,
     propertyKey: string,
-    descriptor?: PropertyDescriptor
+    descriptor?:
+      | TypedPropertyDescriptor<() => Promise<string>>
+      | TypedPropertyDescriptor<() => string>
+      | TypedPropertyDescriptor<(...args: any) => Promise<string>>
+      | TypedPropertyDescriptor<(...args: any) => string>
   ): void {
     Reflect.defineMetadata('chat_function', data, target, propertyKey);
   };
@@ -317,6 +321,8 @@ export class ChatFunctionsController {
     try {
       const result = await this.handleFunctionCall(name, args);
       let truncatedResult = result;
+      if (truncatedResult === undefined) {
+      }
       while (!isWithinTokenLimit(truncatedResult, opts.requestMaxTokens)) {
         if (truncatedResult.length > 4 * opts.requestMaxTokens) {
           truncatedResult = truncatedResult.substring(
