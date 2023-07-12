@@ -57,7 +57,10 @@ export interface GetFunctionMessageOptions {
 
 /** Options for getting message completions. */
 export interface GetCompletionOptions {
+  // The model to use.
   model: string;
+  // Whether to automatically call functions until a non-function response is returned.
+  callFunctions: boolean;
 }
 
 /** Options for the chat functions controller. */
@@ -358,13 +361,27 @@ export class ChatFunctionsController {
    * @param options Options for getting the completion.
    */
   async getNextCompletion(options?: Partial<GetCompletionOptions>) {
-    const opt: GetCompletionOptions = {model: this.options.model, ...options};
+    const opt: GetCompletionOptions = {
+      model: this.options.model,
+      callFunctions: false,
+      ...options,
+    };
 
-    const response = await this.openai.createChatCompletion({
+    let response = await this.openai.createChatCompletion({
       model: opt.model,
       messages: this.messages,
       functions: this.getRegisteredFunctions(),
     });
+
+    if (opt.callFunctions) {
+      const message = await this.getFunctionMessage(
+        response.data.choices[0].message?.function_call!.name!,
+        response.data.choices[0].message?.function_call!.arguments!
+      );
+      this.messages.push(message);
+      // TODO: this can call until token limit, set a max depth?
+      response = await this.getNextCompletion(opt);
+    }
 
     if (response.data.usage) {
       this.usage = response.data.usage;
