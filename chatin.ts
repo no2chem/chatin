@@ -374,13 +374,15 @@ export class ChatFunctionsController {
     });
 
     if (opt.callFunctions) {
-      const message = await this.getFunctionMessage(
-        response.data.choices[0].message?.function_call!.name!,
-        response.data.choices[0].message?.function_call!.arguments!
-      );
-      this.messages.push(message);
-      // TODO: this can call until token limit, set a max depth?
-      response = await this.getNextCompletion(opt);
+      if (response.data.choices[0].message?.function_call) {
+        const message = await this.getFunctionMessage(
+          response.data.choices[0].message?.function_call!.name!,
+          response.data.choices[0].message?.function_call!.arguments!
+        );
+        this.messages.push(message);
+        // TODO: this can call until token limit, set a max depth?
+        response = await this.getNextCompletion(opt);
+      }
     }
 
     if (response.data.usage) {
