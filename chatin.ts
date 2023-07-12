@@ -379,6 +379,8 @@ export class ChatFunctionsController {
       functions: this.getRegisteredFunctions(),
     });
 
+    this.messages.push(response.data.choices[0].message!);
+
     if (opt.callFunctions) {
       if (response.data.choices[0].message?.function_call) {
         const message = await this.getFunctionMessage(
