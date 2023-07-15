@@ -3,6 +3,7 @@
   "version": "1.2.3",
   "type": "module",
   "description": "ChatGPT library with function call interface support",
+  "repository": "https://github.com/no2chem/chatin",
   "main": "dist/index.js",
   "scripts": {
     "test": "tsup chatin.ts --dts --format cjs,esm -d .",
